@@ -1,0 +1,40 @@
+# The container is named based on the table.
+[c-devel]
+image = "fedora-toolbox:39"
+pull = "always"
+# Additional arguments to pass to podman during creation. 
+additional_args = ["--env-host"]
+
+[c-devel.init]
+# Additional packages to install.
+packages = ["clang", "clang-tools-extra"]
+# Optional. If the container image uses a non-supported package manager,
+# this can be used to provide the correct invocation. %packages% is replaced with the above
+# array.
+package_command = "dnf install -y %packages%"
+
+# Array of commands to run at the start of container init.
+# (Before the user is created in the container, for example.)
+pre_init = ["touch /etc/.preinit"]
+
+# Array of commands to run at the end of container init.
+init = [
+    'dnf groupinstall -y "Development Tools"',
+    'dnf groupinstall -y "C Development Tools and Libraries"'
+]
+
+[c-devel.share]
+# Defaults to "private."
+net = "private"
+ipc = "private"
+# Bind-mounts /dev and /sys.
+dev = true
+# Bind-mounts /mnt and /media.
+mnt = true
+# Specify security options.
+sec = ["seccomp=unconfined"]
+
+mounts = [
+    { type = "bind", src = "/home/colonial/Documents", dst = "/home/colonial/Documents", opts = ["Z"] },
+    # And so on.
+]
